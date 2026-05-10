@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章詳情 — Weekly Food Hot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #5C3D2E;
+            --accent: #F2994A;
+            --accent-hover: #E0893A;
+            --bg: #FFFFFF;
+            --bg-light: #F8F5F2;
+            --text-title: #2D3748;
+            --text-body: #4A5568;
+            --text-muted: #718096;
+            --border: #EDE8E3;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-hover: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
+            --radius: 10px;
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: inherit; text-decoration: none; }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .header-top {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            padding: 20px 0 16px;
+            flex-wrap: wrap;
+        }
+        .header-brand {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+        .header-brand h1 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+        .header-brand .divider { color: var(--border); font-weight: 300; }
+        .header-brand .zh-name { font-size: 18px; font-weight: 700; color: var(--text-title); }
+        .header-period { font-size: 13px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+        .header-subtitle { width: 100%; font-size: 13px; color: var(--text-muted); font-weight: 400; }
+        .header-nav {
+            display: flex;
+            gap: 0;
+            border-top: 1px solid var(--border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .header-nav a {
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: color 0.2s, border-color 0.2s;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+        .header-nav a:hover,
+        .header-nav a.active { color: var(--primary); border-bottom-color: var(--accent); }
+        .header-nav a:first-child { padding-left: 0; }
+
+        /* ===== PAGE ===== */
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 28px;
+        }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .breadcrumb a { color: var(--text-muted); transition: color 0.2s; }
+        .breadcrumb a:hover { color: var(--accent); }
+        .breadcrumb span { color: var(--text-muted); margin: 0 6px; }
+        .breadcrumb .current { color: var(--text-body); font-weight: 500; }
+
+        /* ===== ARTICLE ===== */
+        .article { background: var(--bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+
+        .article-image {
+            aspect-ratio: 16 / 7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .article-image .image-icon { font-size: 80px; filter: drop-shadow(0 4px 16px rgba(0,0,0,0.15)); z-index: 1; }
+        .article-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .article-body { padding: 28px 24px 32px; }
+        .article-category {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 4px;
+            color: var(--accent);
+            background: #FEF3EA;
+            margin-bottom: 14px;
+        }
+        .article-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-title);
+            line-height: 1.35;
+            margin-bottom: 12px;
+        }
+        .article-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        .article-meta .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .article-meta .source-badge .badge-logo {
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .article-content {
+            font-size: 16px;
+            line-height: 1.9;
+            color: var(--text-body);
+        }
+        .article-content p {
+            margin-bottom: 18px;
+        }
+        .article-content .highlight-box {
+            background: var(--bg-light);
+            border-left: 3px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 6px 6px 0;
+            margin: 20px 0;
+            font-size: 15px;
+            color: var(--text-body);
+        }
+        .article-content .highlight-box strong { color: var(--primary); }
+
+        .article-footer {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+        .article-footer .article-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .article-footer .article-tags .tag {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 4px;
+            background: var(--bg-light);
+            color: var(--text-muted);
+        }
+        .article-footer .original-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 24px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .article-footer .original-link:hover { background: var(--accent-hover); }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 20px;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--accent); }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar { display: flex; flex-direction: column; gap: 20px; }
+        .sidebar-section {
+            background: var(--bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .sidebar-section .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hot-list { list-style: none; }
+        .hot-list li {
+            display: flex;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            align-items: flex-start;
+        }
+        .hot-list li:last-child { border-bottom: none; padding-bottom: 0; }
+        .hot-list .rank {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-muted);
+            min-width: 20px;
+            font-feature-settings: "tnum";
+        }
+        .hot-list .rank.top1 { color: #E74C3C; }
+        .hot-list .rank.top2 { color: var(--accent); }
+        .hot-list .rank.top3 { color: #F1C40F; }
+        .hot-list .hot-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-title);
+            line-height: 1.4;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .hot-list .hot-views { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        .source-sites { list-style: none; }
+        .source-sites li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .source-sites li:last-child { border-bottom: none; padding-bottom: 0; }
+        .source-sites .site-left { display: flex; align-items: center; gap: 8px; }
+        .source-sites .site-name { font-size: 13px; font-weight: 500; color: var(--text-title); }
+        .source-sites .site-count { font-size: 12px; color: var(--text-muted); }
+        .source-sites .site-logo {
+            width: 20px; height: 20px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+
+        .subscribe p { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.6; }
+        .subscribe-form { display: flex; gap: 8px; }
+        .subscribe-form input {
+            flex: 1; padding: 9px 12px; border: 1px solid var(--border);
+            border-radius: 6px; font-size: 13px; font-family: inherit;
+            outline: none; color: var(--text-body);
+        }
+        .subscribe-form input:focus { border-color: var(--accent); }
+        .subscribe-form button {
+            padding: 9px 18px; background: var(--accent); color: #fff;
+            border: none; border-radius: 6px; font-size: 13px;
+            font-weight: 600; font-family: inherit; cursor: pointer;
+            transition: background 0.2s; white-space: nowrap;
+        }
+        .subscribe-form button:hover { background: var(--accent-hover); }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            padding: 32px 20px;
+            text-align: center;
+        }
+        .footer-inner { max-width: 1200px; margin: 0 auto; }
+        .footer-links {
+            display: flex; justify-content: center;
+            gap: 24px; margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .footer-links a { font-size: 13px; color: var(--text-muted); transition: color 0.2s; }
+        .footer-links a:hover { color: var(--primary); }
+        .footer p { font-size: 12px; color: var(--text-muted); line-height: 1.8; }
+        .footer .highlight { color: var(--primary); font-weight: 500; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 640px) {
+            .article-title { font-size: 30px; }
+            .article-body { padding: 36px 32px 40px; }
+            .article-image .image-icon { font-size: 96px; }
+        }
+        @media (min-width: 1024px) {
+            .page { padding: 28px 24px; grid-template-columns: 1fr 300px; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bbb; }
+
+        /* ===== LOADING ===== */
+        .status { text-align: center; padding: 80px 20px; display: none; }
+        .status.visible { display: block; }
+        .status .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid #f0e6dc; border-top-color: var(--accent);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .status p { color: var(--text-muted); font-size: 15px; }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-top">
+                <div class="header-brand">
+                    <a href="/" style="display:flex;align-items:baseline;gap:10px;">
+                        <h1>Weekly Food Hot</h1>
+                        <span class="divider">|</span>
+                        <span class="zh-name">每周美食热点</span>
+                    </a>
+                </div>
+                <div class="header-period" id="periodDisplay"></div>
+                <div class="header-subtitle">聚合全网美食趋势 · 新品 · 探店 · 节日饮食</div>
+            </div>
+            <nav class="header-nav">
+                <a href="/">首页</a>
+                <a href="#" class="active">文章详情</a>
+                <a href="#">往期回顾</a>
+                <a href="#">来源站点</a>
+                <a href="#">关于我们</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- PAGE -->
+    <div class="page">
+        <div class="status visible" id="loadingStatus">
+            <div class="spinner"></div>
+            <p>載入文章...</p>
+        </div>
+        <div id="articleContainer" style="display:none;"></div>
+        <aside class="sidebar" id="sidebarContainer"></aside>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="/">首页</a>
+                <a href="#">往期回顾</a>
+                <a href="#">来源站点</a>
+                <a href="#">关于我们</a>
+                <a href="#">隐私政策</a>
+            </div>
+            <p>
+                <span class="highlight">Weekly Food Hot | 每周美食热点</span> ·
+                资讯来源各大美食媒体、平台及社交媒体 ·
+                <span class="highlight">第<span id="periodNum">12</span>期</span>
+            </p>
+            <p>本站内容为AI聚合整理，仅供参考。如有版权问题请联系我们。 &copy; 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        // ===== PERIOD =====
+        const today = new Date();
+        const weekNum = Math.ceil((today.getDate() - today.getDay() + 1) / 7) + 1;
+        const weekOfMonth = Math.ceil(today.getDate() / 7);
+        document.getElementById('periodDisplay').textContent =
+            `第${weekNum}期 · ${today.getFullYear()}年${today.getMonth() + 1}月第${weekOfMonth}周`;
+        document.getElementById('periodNum').textContent = weekNum;
+
+        // ===== ARTICLE DATA =====
+        const ARTICLE_DATA = {
+            news: [
+                {
+                    id: 1,
+                    title: '麦当劳中国推出端午限定「粽香汉堡」套餐',
+                    category: '新品上市',
+                    source: '麦当劳',
+                    sourceColor: '#E74C3C',
+                    publishTime: '2026-05-08',
+                    views: '12.3万',
+                    imageColor: 'linear-gradient(135deg, #F2994A, #E67E22)',
+                    imageIcon: '🍔',
+                    content: [
+                        '麦当劳中国正式推出2026年端午限定系列，其中最受瞩目的当属「粽香汉堡」——以糯米饼代替传统面包胚，搭配秘制酱香猪肉、咸蛋黄和脆生菜，将端午粽子的经典元素以全新形式融入西式快餐。',
+                        '该产品于5月6日起在全国麦当劳门店限时发售，售价为单点28元、套餐42元。据品牌方透露，该产品研发历时6个月，经过多轮口味测试才最终定型。糯米饼采用特制配方，口感外酥内糯，完美复刻了粽子的灵魂口感。',
+                        '上市首日即引发消费者排队热潮，社交媒体上「粽香汉堡」话题阅读量突破5000万。不少美食博主评价其「创意十足，意外地和谐好吃」。但也有消费者表示「更像是糯米鸡，和汉堡关系不大」的有趣争议。',
+                        '值得关注的是，这已不是麦当劳第一次尝试端午限定产品。自2023年起，麦当劳每年都会推出节日限定产品，从端午到中秋，持续探索「西式快餐+中国传统节日」的创新路径。'
+                    ],
+                    tags: ['限定产品', '端午', '快餐创新'],
+                    url: 'https://mcdonalds.com'
+                },
+                {
+                    id: 2,
+                    title: '上海「隐藏版」日式居酒屋爆火，预约已排到六月',
+                    category: '探店爆款',
+                    source: '大众点评',
+                    sourceColor: '#E74C3C',
+                    publishTime: '2026-05-09',
+                    views: '8.7万',
+                    imageColor: 'linear-gradient(135deg, #E74C3C, #C0392B)',
+                    imageIcon: '🍶',
+                    content: [
+                        '藏身于上海法租界弄堂深处的「隠れ家」，是一家仅设8个席位的极简日式居酒屋。没有招牌、没有菜单、不接受walk-in——这家店却在小红书和大众点评上悄然爆红，目前预约已排到6月中旬。',
+                        '店主兼主厨铃木先生曾在东京银座名店修业12年，每日亲自手写菜单，根据当天进货的食材决定菜品。他坚持「一客一菜」的理念，每道菜都在吧台前现场制作，客人可以全程观赏烹饪过程。',
+                        '推荐菜品包括：北海道海胆配柚子醋冻、炭烤A5和牛搭配山葵、以及招牌的「隐藏版」茶泡饭——用三种不同的茶底调配，每一口都有不同的风味层次。',
+                        '人均消费约800-1200元，在这个价位段能吃到如此用心和个性化的料理，实属难得。不过老板也坦言，8个席位已经是他一个人能服务的极限，短期内不会考虑扩大规模。'
+                    ],
+                    tags: ['日式料理', '预约制', '隐藏店铺'],
+                    url: '#'
+                },
+                {
+                    id: 3,
+                    title: '2026夏季奶茶新品盘点：这6杯值得喝',
+                    category: '新品上市',
+                    source: '小红书',
+                    sourceColor: '#FF6B6B',
+                    publishTime: '2026-05-07',
+                    views: '23.5万',
+                    imageColor: 'linear-gradient(135deg, #F2994A, #E67E22)',
+                    imageIcon: '🧋',
+                    content: [
+                        '随着气温攀升，各大茶饮品牌纷纷推出夏季限定新品。小红书美食团队从口味、颜值、性价比三个维度，实测了6款最值得尝试的夏季奶茶新品。',
+                        '喜茶「多肉葡萄」系列升级回归，新增芝士葡萄冰沙版本，选用当季巨峰葡萄，果肉饱满多汁，搭配轻乳酪芝士奶盖，清爽不腻。奈雪的茶推出「龙井奶盖」系列，用明前龙井茶底搭配淡奶油奶盖，茶香浓郁、回甘悠长。',
+                        '蜜雪冰城则以极致性价比出招——4元的「冰鲜柠檬水」和6元的「西瓜椰椰」成为今夏最便宜的解暑神器。而茶颜悦色仅在长沙限定的「栀子椰」融合栀子花茶和生椰乳，被粉丝称为「夏天该有的味道」。',
+                        '乐乐茶推出「一整颗椰子冻」系列，将整颗椰子冻放入奶茶中，口感Q弹，拍照也极具视觉冲击力。最后是瑞幸咖啡的「柚C美式」，将西柚汁和冷萃咖啡结合，意外地和谐，成为办公族的新宠。'
+                    ],
+                    tags: ['奶茶', '夏季限定', '饮品测评'],
+                    url: '#'
+                },
+                {
+                    id: 4,
+                    title: '端午将至！五大流派粽子口味大比拼',
+                    category: '节日美食',
+                    source: '美食天下',
+                    sourceColor: '#27AE60',
+                    publishTime: '2026-05-06',
+                    views: '15.2万',
+                    imageColor: 'linear-gradient(135deg, #5C3D2E, #8B6914)',
+                    imageIcon: '🍙',
+                    content: [
+                        '端午节将至，「甜咸之争」再次成为美食圈的热门话题。但事实上，中国粽子的版图远不止甜咸两派。本文带你一探五大流派的独特魅力。',
+                        '北京甜粽派：以糯米红枣粽为代表，蘸白糖或桂花蜜食用，口感软糯清甜，是北方人的童年记忆。嘉兴鲜肉粽：被誉为「粽子之王」，选用五花肉经过酱油腌渍，与糯米一同蒸煮，油脂渗入米粒，咸香四溢。',
+                        '广东咸肉粽：用料最为丰富，除了五花肉，还加入咸蛋黄、香菇、虾米、瑶柱等，一个粽子就是一顿盛宴。闽南烧肉粽：先用卤汁炒制糯米，再加入红烧肉、莲子、栗子等，口感层次丰富，常配上甜辣酱食用。',
+                        '潮汕双烹粽：最为特别——一半甜一半咸，甜馅是豆沙或芋泥，咸馅是猪肉和咸蛋，一次满足两种口味，堪称粽子界的「鸳鸯锅」。你最喜欢哪种？'
+                    ],
+                    tags: ['端午', '传统美食', '甜咸之争'],
+                    url: '#'
+                },
+                {
+                    id: 5,
+                    title: '生椰拿铁之后，2026咖啡赛道新风口在哪？',
+                    category: '行业趋势',
+                    source: '36氪',
+                    sourceColor: '#3498DB',
+                    publishTime: '2026-05-05',
+                    views: '6.8万',
+                    imageColor: 'linear-gradient(135deg, #4A5568, #2D3748)',
+                    imageIcon: '☕',
+                    content: [
+                        '2022年生椰拿铁横空出世，带动了整个咖啡行业的创新浪潮。四年过去，2026年的咖啡赛道正在酝酿新一轮的变革——「茶咖融合」「果咖」「功能咖啡」成为三大新风口。',
+                        '茶咖融合：以茉莉拿铁、龙井拿铁为代表，将中国传统茶文化与精品咖啡结合。据统计，2026年Q1茶咖类产品订单量同比增长超过200%，成为各大品牌争相布局的赛道。',
+                        '果咖崛起：从早期的柠檬美式到现在的柚子冷萃、蜜瓜拿铁，水果与咖啡的搭配越来越大胆。不同于以往添加糖浆的做法，新一代果咖更注重使用真实果肉和果汁，强调自然甜感。',
+                        '功能咖啡：添加胶原蛋白、益生菌、GABA等成分的功能性咖啡正在崛起，主要瞄准都市白领人群「既想提神又想养生」的矛盾需求。不过业内专家也提醒，功能咖啡的市场教育仍需时间。'
+                    ],
+                    tags: ['咖啡', '行业趋势', '消费洞察'],
+                    url: '#'
+                },
+                {
+                    id: 6,
+                    title: '北京胡同新晋网红Brunch店打卡测评',
+                    category: '探店爆款',
+                    source: '抖音美食',
+                    sourceColor: '#FF6B6B',
+                    publishTime: '2026-05-09',
+                    views: '18.9万',
+                    imageColor: 'linear-gradient(135deg, #E74C3C, #C0392B)',
+                    imageIcon: '🥞',
+                    content: [
+                        '南锣鼓巷附近的沙井胡同里，新开了一家名叫「AM:PM」的澳洲风格Brunch店，迅速在小红书和抖音上刷屏。周末排队两小时起步，甚至有人早上7点就来等开门。',
+                        '门面是典型的北京灰砖四合院改造，推门而入却是温暖的木质北欧风。菜单主打澳洲经典Brunch：熔岩蛋配酸面包（Rumbled Eggs on Sourdough）是招牌，鸡蛋滑嫩如奶油，搭配烤得酥脆的酸面包，简单却极致。',
+                        '酪乳煎饼（Buttermilk Pancake）是另一道必点，三层松软煎饼叠在一起，淋上枫糖浆和新鲜莓果，甜度控制得刚好。搭配一杯Flat White，就是完美的周末早午餐。',
+                        '价位在人均120-180元之间，在胡同Brunch中属于中等偏上。以这样的品质和环境来说，性价比其实不错。建议工作日去，体验会好很多。'
+                    ],
+                    tags: ['Brunch', '北京探店', '网红店'],
+                    url: '#'
+                },
+                {
+                    id: 7,
+                    title: '轻食市场年增长42%，健康餐盒成白领新宠',
+                    category: '健康轻食',
+                    source: '餐饮老板内参',
+                    sourceColor: '#27AE60',
+                    publishTime: '2026-05-04',
+                    views: '4.5万',
+                    imageColor: 'linear-gradient(135deg, #2ECC71, #27AE60)',
+                    imageIcon: '🥗',
+                    content: [
+                        '2026年Q1餐饮行业数据显示，轻食外卖订单量同比增长42%，远高于整体外卖市场的增速。其中高蛋白低卡餐盒和地中海沙拉碗最受欢迎，分别占据轻食品类的35%和28%。',
+                        '这一增长背后有多重驱动因素：首先是健康意识的持续提升，越来越多的消费者开始关注热量摄入和营养均衡；其次是供给端的丰富，从早期的单调沙拉到现在的热轻食、杂粮饭、波奇碗等，选择大幅增加。',
+                        '值得关注的是，轻食市场正在从一线城市向二三线城市渗透。数据显示，成都、杭州、南京等新一线城市的轻食订单增速已超过北上广深，成为新的增长引擎。',
+                        '头部品牌如「超能鹿战队」「蔬小盒」「gaga鲜语」等纷纷加快开店步伐，而便利店巨头全家、7-Eleven也加大了健康餐盒的供应比例。轻食，正在从一个小众品类走向大众日常。'
+                    ],
+                    tags: ['健康饮食', '市场分析', '外卖趋势'],
+                    url: '#'
+                },
+                {
+                    id: 8,
+                    title: '成都建设路美食街全面升级，30+新店入驻',
+                    category: '地方风味',
+                    source: '成都发布',
+                    sourceColor: '#E67E22',
+                    publishTime: '2026-05-03',
+                    views: '11.2万',
+                    imageColor: 'linear-gradient(135deg, #27AE60, #1E8449)',
+                    imageIcon: '🌶️',
+                    content: [
+                        '被誉为「成都小吃第一街」的建设路，近日完成全面改造升级，以全新的面貌重新亮相。此次升级引入了30余家新派川菜和文创餐饮店铺，同时保留了原有的经典老店。',
+                        '新入驻的店铺中，最受关注的是「川味实验室」——一家以分子料理手法重新演绎经典川菜的概念餐厅。「鱼香泡沫」「麻辣冰淇淋」「钵钵鸡慕斯」等创意菜品引发了年轻人的热烈讨论。',
+                        '除了餐饮升级，整条街的步行体验也大幅改善——拓宽了人行道，增设了休闲座椅和绿植景观，并打造了「夜市光影秀」每晚定时上演。建设路正从「小吃街」升级为「美食文化地标」。',
+                        '成都市政府表示，建设路美食街的升级是「成都打造国际美食之都」的重要组成部分，未来还将有更多类似的改造项目推进。'
+                    ],
+                    tags: ['成都美食', '美食街', '川菜'],
+                    url: '#'
+                },
+                {
+                    id: 9,
+                    title: '米其林2026上海榜单发布，3家新餐厅摘星',
+                    category: '行业趋势',
+                    source: '名厨',
+                    sourceColor: '#2C3E50',
+                    publishTime: '2026-05-02',
+                    views: '9.6万',
+                    imageColor: 'linear-gradient(135deg, #4A5568, #2D3748)',
+                    imageIcon: '⭐',
+                    content: [
+                        '2026年上海米其林指南于5月2日正式发布，共有46家餐厅入榜。其中三星餐厅3家、二星餐厅8家、一星餐厅35家。今年新增的3家一星餐厅中，一家素食餐厅的入选格外引人注目。',
+                        '新增摘星的「福和慧」是上海首家获得米其林一星的素食餐厅。主厨将素食提升到了全新的高度，运用当季食材和精湛的烹饪技艺，呈现出令人惊叹的素食美学。评论认为这标志着高端素食的正式崛起。',
+                        '另一家新晋一星「甬府·外滩」主打宁波菜，将东海海鲜与传统甬菜技法结合，招牌「葱油大黄鱼」和「宁波汤圆」获得了评审的高度评价。第三家「凌·怀石」则是一家仅设6个座位的极简怀石料理。',
+                        '三星餐厅方面，Ultraviolet by Paul Pairet、唐阁、泰安门继续保持三星荣誉，展现了上海高端餐饮的稳定水准。完整榜单已在米其林官网公布。'
+                    ],
+                    tags: ['米其林', '上海', '榜单'],
+                    url: '#'
+                }
+            ],
+            hotTop5: [
+                { title: '上海隐藏版居酒屋预约排到六月', views: '18.9万' },
+                { title: '2026夏季奶茶新品盘点', views: '23.5万' },
+                { title: '粽子口味大比拼 南北之争再起', views: '15.2万' },
+                { title: '北京胡同Brunch店打卡测评', views: '12.7万' },
+                { title: '轻食市场年增长42%', views: '9.8万' }
+            ],
+            sourceSites: [
+                { name: '小红书', color: '#FF6B6B', count: '32篇' },
+                { name: '大众点评', color: '#E74C3C', count: '28篇' },
+                { name: '抖音美食', color: '#1E1E1E', count: '24篇' },
+                { name: '美食天下', color: '#27AE60', count: '19篇' },
+                { name: '餐饮老板内参', color: '#3498DB', count: '15篇' },
+                { name: '名厨', color: '#2C3E50', count: '12篇' }
+            ]
+        };
+
+        // ===== GET ID =====
+        const params = new URLSearchParams(window.location.search);
+        const articleId = parseInt(params.get('id')) || 1;
+
+        // ===== RENDER ARTICLE =====
+        function renderArticle(id) {
+            const article = ARTICLE_DATA.news.find(n => n.id === id);
+            const loading = document.getElementById('loadingStatus');
+            const container = document.getElementById('articleContainer');
+
+            if (!article) {
+                loading.classList.remove('visible');
+                container.style.display = 'block';
+                container.innerHTML = `<div class="status"><p>文章不存在或已下架</p><a href="/" style="display:inline-block;margin-top:12px;color:var(--accent);">返回首页</a></div>`;
+                return;
+            }
+
+            document.title = `${article.title} — Weekly Food Hot`;
+
+            const logoLetter = article.source.charAt(0);
+            const bodyHtml = article.content.map(p => `<p>${p}</p>`).join('');
+            const tagsHtml = article.tags.map(t => `<span class="tag">${t}</span>`).join('');
+
+            container.innerHTML = `
+                <article class="article">
+                    <div class="article-image" style="background:${article.imageColor}">
+                        <span class="image-icon">${article.imageIcon}</span>
+                    </div>
+                    <div class="article-body">
+                        <span class="article-category">${article.category}</span>
+                        <h1 class="article-title">${article.title}</h1>
+                        <div class="article-meta">
+                            <span class="source-badge">
+                                <span class="badge-logo" style="background:${article.sourceColor}">${logoLetter}</span>
+                                ${article.source}
+                            </span>
+                            <span>📅 ${article.publishTime}</span>
+                            <span>👁️ ${article.views}阅读</span>
+                        </div>
+                        <div class="article-content">
+                            ${bodyHtml}
+                        </div>
+                        <div class="article-footer">
+                            <div class="article-tags">${tagsHtml}</div>
+                            <a href="${article.url}" class="original-link" target="_blank" rel="noopener">
+                                阅读原文 →
+                            </a>
+                        </div>
+                        <a href="/" class="back-link">← 返回首页</a>
+                    </div>
+                </article>
+            `;
+
+            loading.classList.remove('visible');
+            container.style.display = 'block';
+        }
+
+        // ===== RENDER HOT =====
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebarContainer');
+            const hotHtml = ARTICLE_DATA.hotTop5.map((item, i) => {
+                const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+                return `<li><span class="rank ${rankClass}">${String(i + 1).padStart(2, '0')}</span>
+                    <div><div class="hot-title">${item.title}</div><div class="hot-views">${item.views}阅读</div></div></li>`;
+            }).join('');
+            const sourceHtml = ARTICLE_DATA.sourceSites.map(s =>
+                `<li><div class="site-left"><span class="site-logo" style="background:${s.color}">${s.name.charAt(0)}</span>
+                <span class="site-name">${s.name}</span></div><span class="site-count">${s.count}</span></li>`
+            ).join('');
+
+            sidebar.innerHTML = `
+                <div class="sidebar-section">
+                    <div class="section-title">🔥 本周热门 TOP5</div>
+                    <ol class="hot-list">${hotHtml}</ol>
+                </div>
+                <div class="sidebar-section">
+                    <div class="section-title">📡 热门来源站点</div>
+                    <ul class="source-sites">${sourceHtml}</ul>
+                </div>
+                <div class="sidebar-section subscribe">
+                    <div class="section-title">✉️ 订阅周报</div>
+                    <p>每周一封邮件，精选本周美食热点，不错过任何精彩。</p>
+                    <div class="subscribe-form">
+                        <input type="email" placeholder="输入邮箱地址…">
+                        <button>订阅</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== INIT =====
+        renderArticle(articleId);
+        renderSidebar();
+    </script>
+</body>
+</html>

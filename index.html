@@ -791,9 +791,11 @@
         function renderNews(data) {
             const grid = document.getElementById('newsGrid');
             grid.innerHTML = '';
-            data.forEach(item => {
+            data.forEach((item, idx) => {
                 const card = document.createElement('article');
                 card.className = 'news-card';
+                card.style.cursor = 'pointer';
+                const id = item.id || (idx + 1);
                 const logoLetter = item.source.charAt(0);
                 card.innerHTML = `
                     <div class="card-source-bar">
@@ -814,10 +816,11 @@
                         <p class="card-summary">${item.summary}</p>
                         <div class="card-actions">
                             <span class="card-tag">${item.category}</span>
-                            <a href="${item.url}" class="card-link" target="_blank">阅读原文 →</a>
+                            <span class="card-link" style="cursor:pointer">阅读全文 →</span>
                         </div>
                     </div>
                 `;
+                card.addEventListener('click', () => { window.location.href = 'detail.html?id=' + id; });
                 grid.appendChild(card);
             });
         }
