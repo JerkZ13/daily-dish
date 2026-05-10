@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/dish.js": {
+      "maxDuration": 30
+    }
+  }
+}

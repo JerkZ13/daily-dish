@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>每日美食推薦 - AI 精選料理</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E55A2B;
+            --secondary: #C0392B;
+            --accent-1: #FF6B35;
+            --accent-2: #E74C3C;
+            --accent-3: #8E44AD;
+            --bg: #FFF8F0;
+            --card-bg: #FFFFFF;
+            --text: #2D3436;
+            --text-light: #636E72;
+            --shadow: 0 8px 32px rgba(0,0,0,0.08);
+            --radius: 20px;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, #FF6B35 0%, #E74C3C 50%, #C0392B 100%);
+            padding: 48px 20px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: var(--bg);
+            border-radius: 40px 40px 0 0;
+        }
+        .header-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .header h1 {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 900;
+            font-size: 28px;
+            color: #fff;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .header .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+            margin-top: 8px;
+            font-weight: 300;
+            letter-spacing: 4px;
+        }
+        .header .date-display {
+            color: rgba(255,255,255,0.85);
+            font-size: 13px;
+            margin-top: 6px;
+            font-weight: 300;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 960px;
+            margin: -50px auto 40px;
+            padding: 0 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== STATUS MESSAGES ===== */
+        .status {
+            text-align: center;
+            padding: 60px 20px;
+            display: none;
+        }
+        .status.visible {
+            display: block;
+        }
+        .status .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f0f0f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .status p {
+            color: var(--text-light);
+            font-size: 15px;
+        }
+        .status .error-icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 12px;
+        }
+        .status .retry-btn {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 10px 28px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .status .retry-btn:hover {
+            background: var(--primary-dark);
+        }
+        .status .retry-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* ===== GRID ===== */
+        .dishes-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .dishes-grid.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== CARD ===== */
+        .dish-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        .dish-card.animate-in {
+            animation: cardIn 0.6s ease forwards;
+        }
+        @keyframes cardIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .dish-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+
+        .card-image {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-image .emoji-bg {
+            font-size: 64px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        .card-image .rank-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 50px;
+            letter-spacing: 1px;
+        }
+        .card-image .cuisine-tag {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 14px;
+            border-radius: 50px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+        .card-body h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        .card-body .dish-name-en {
+            font-family: 'Playfair Display', serif;
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 14px;
+            font-style: italic;
+        }
+
+        .card-body .section {
+            margin-top: 14px;
+        }
+        .card-body .section:first-of-type {
+            margin-top: 0;
+        }
+        .card-body .section-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-light);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .card-body .section-label .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .card-body .section-content {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        .card-body .difficulty {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 14px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        .card-body .difficulty .stars {
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+
+        /* ===== CARD COLOR THEMES ===== */
+        .dish-card:nth-child(1) .card-image {
+            background: linear-gradient(135deg, #FF6B35, #F7A072);
+        }
+        .dish-card:nth-child(1) .section-label .dot { background: var(--accent-1); }
+
+        .dish-card:nth-child(2) .card-image {
+            background: linear-gradient(135deg, #E74C3C, #F1948A);
+        }
+        .dish-card:nth-child(2) .section-label .dot { background: var(--accent-2); }
+
+        .dish-card:nth-child(3) .card-image {
+            background: linear-gradient(135deg, #8E44AD, #BB8FCE);
+        }
+        .dish-card:nth-child(3) .section-label .dot { background: var(--accent-3); }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-light);
+            font-size: 13px;
+            font-weight: 300;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            margin-top: 8px;
+        }
+        .footer .brand {
+            font-weight: 500;
+            color: var(--text);
+        }
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 640px) {
+            .dishes-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .header { padding: 56px 20px 80px; }
+            .header h1 { font-size: 34px; }
+            .header-icon { font-size: 56px; }
+        }
+
+        @media (min-width: 900px) {
+            .dishes-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .container {
+                padding: 0 24px;
+            }
+            .card-image { height: 180px; }
+            .card-image .emoji-bg { font-size: 72px; }
+        }
+
+        /* ===== SMOOTH SCROLL ===== */
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <span class="header-icon">🍽️</span>
+        <h1>今日美食推薦</h1>
+        <p class="subtitle">AI 為您精心挑選 · 每日更新</p>
+        <p class="date-display" id="dateDisplay"></p>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="container">
+
+        <!-- Loading -->
+        <div class="status visible" id="loadingStatus">
+            <div class="spinner"></div>
+            <p>AI 正在為您精選今日料理...</p>
+        </div>
+
+        <!-- Error -->
+        <div class="status" id="errorStatus">
+            <span class="error-icon">😅</span>
+            <p id="errorMessage">暫時無法取得推薦，請稍後再試</p>
+            <button class="retry-btn" onclick="loadDishes()">重新整理</button>
+        </div>
+
+        <!-- Dishes Grid -->
+        <div class="dishes-grid" id="dishesGrid"></div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>
+            <span class="brand">🍳 每日美食推薦</span> ·
+            由 <a href="https://deepseek.com" target="_blank">DeepSeek AI</a> 精心生成 ·
+            部署於 <a href="https://vercel.com" target="_blank">Vercel</a>
+        </p>
+    </footer>
+
+    <script>
+        // ===== DATE =====
+        const today = new Date();
+        const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        document.getElementById('dateDisplay').textContent =
+            `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日 ${days[today.getDay()]}`;
+
+        // ===== API CONFIG =====
+        const API_URL = '/api/dish';
+
+        // ===== LOAD DISHES =====
+        async function loadDishes() {
+            const grid = document.getElementById('dishesGrid');
+            const loading = document.getElementById('loadingStatus');
+            const error = document.getElementById('errorStatus');
+
+            // Reset UI
+            grid.classList.remove('visible');
+            grid.innerHTML = '';
+            loading.classList.add('visible');
+            error.classList.remove('visible');
+
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error(`伺服器回應異常 (${res.status})`);
+
+                const data = await res.json();
+
+                if (!data.dishes || data.dishes.length === 0) {
+                    throw new Error('暫時沒有推薦料理，請稍後再試');
+                }
+
+                loading.classList.remove('visible');
+                renderDishes(data.dishes, grid);
+
+            } catch (err) {
+                loading.classList.remove('visible');
+                document.getElementById('errorMessage').textContent = err.message || '無法連線至伺服器';
+                error.classList.add('visible');
+            }
+        }
+
+        // ===== RENDER DISHES =====
+        function renderDishes(dishes, grid) {
+            const rankLabels = ['首選推薦', '精選推薦', '不容錯過'];
+
+            dishes.forEach((dish, i) => {
+                const card = document.createElement('div');
+                card.className = 'dish-card';
+
+                const rank = i < rankLabels.length ? rankLabels[i] : `推薦 #${i + 1}`;
+                const difficultyStars = getDifficultyStars(dish.difficulty || '中等');
+
+                card.innerHTML = `
+                    <div class="card-image">
+                        <span class="rank-badge">${rank}</span>
+                        <span class="cuisine-tag">${dish.cuisine || '綜合'}</span>
+                        <span class="emoji-bg">${dish.emoji || '🍽️'}</span>
+                    </div>
+                    <div class="card-body">
+                        <h2>${dish.name}</h2>
+                        ${dish.name_en ? `<p class="dish-name-en">${dish.name_en}</p>` : ''}
+
+                        <div class="section">
+                            <div class="section-label">
+                                <span class="dot"></span> 料理介紹
+                            </div>
+                            <p class="section-content">${dish.description || ''}</p>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-label">
+                                <span class="dot"></span> 推薦原因
+                            </div>
+                            <p class="section-content">${dish.reason || ''}</p>
+                        </div>
+
+                        ${dish.tasting_notes ? `
+                        <div class="section">
+                            <div class="section-label">
+                                <span class="dot"></span> 品味重點
+                            </div>
+                            <p class="section-content">${dish.tasting_notes}</p>
+                        </div>` : ''}
+
+                        <div class="difficulty">
+                            <span>👨‍🍳 難易度</span>
+                            <span class="stars">${difficultyStars}</span>
+                            <span>${dish.difficulty || '中等'}</span>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+
+                // Staggered animation
+                const delay = 150 + i * 200;
+                setTimeout(() => {
+                    card.classList.add('animate-in');
+                }, delay);
+            });
+
+            // Show grid
+            grid.classList.add('visible');
+        }
+
+        function getDifficultyStars(difficulty) {
+            const map = { '簡單': '★', '简易': '★', '中等': '★★', '困難': '★★★', '困难': '★★★' };
+            return map[difficulty] || '★★';
+        }
+
+        // ===== INIT =====
+        loadDishes();
+    </script>
+</body>
+</html>
