@@ -608,7 +608,9 @@
         document.getElementById('periodNum').textContent = weekNum;
 
         // ===== API =====
-        const API_URL = '/api/news';
+        // ===== 後端 API 配置 =====
+        // 本地開發用相對路徑；部署到 COS 後改為 SCF 的 API Gateway 網址
+        const API_URL = window.SCF_API_URL || '/api/news';
 
         // ===== DEMO NEWS DATA =====
         const DEMO_DATA = {
