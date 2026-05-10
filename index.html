@@ -40,7 +40,7 @@
         /* ===== HEADER ===== */
         .header {
             background: linear-gradient(135deg, #FF6B35 0%, #E74C3C 50%, #C0392B 100%);
-            padding: 48px 20px 80px;
+            padding: 44px 20px 80px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -65,36 +65,66 @@
             background: var(--bg);
             border-radius: 40px 40px 0 0;
         }
+
+        /* Floating food emojis */
+        .floating-food {
+            position: absolute;
+            font-size: 32px;
+            opacity: 0.2;
+            pointer-events: none;
+            animation: floatAround 12s ease-in-out infinite;
+        }
+        .floating-food:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; font-size: 28px; }
+        .floating-food:nth-child(2) { top: 20%; right: 12%; animation-delay: 2s; font-size: 36px; }
+        .floating-food:nth-child(3) { bottom: 30%; left: 10%; animation-delay: 4s; font-size: 24px; }
+        .floating-food:nth-child(4) { top: 5%; right: 5%; animation-delay: 1s; font-size: 40px; }
+        .floating-food:nth-child(5) { bottom: 20%; right: 8%; animation-delay: 3s; font-size: 30px; }
+        .floating-food:nth-child(6) { bottom: 10%; left: 40%; animation-delay: 5s; font-size: 26px; }
+
+        @keyframes floatAround {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(5deg); }
+            50% { transform: translateY(-5px) rotate(-3deg); }
+            75% { transform: translateY(-10px) rotate(4deg); }
+        }
+
         .header-icon {
             font-size: 48px;
             display: block;
-            margin-bottom: 12px;
-            animation: float 3s ease-in-out infinite;
+            margin-bottom: 10px;
+            animation: pulse 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         .header h1 {
-            font-family: 'Noto Sans TC', sans-serif;
             font-weight: 900;
             font-size: 28px;
             color: #fff;
             letter-spacing: 2px;
             text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 1;
         }
         .header .subtitle {
             color: rgba(255,255,255,0.9);
             font-size: 14px;
-            margin-top: 8px;
+            margin-top: 6px;
             font-weight: 300;
             letter-spacing: 4px;
+            position: relative;
+            z-index: 1;
         }
         .header .date-display {
             color: rgba(255,255,255,0.85);
             font-size: 13px;
             margin-top: 6px;
             font-weight: 300;
+            position: relative;
+            z-index: 1;
         }
 
         /* ===== CONTAINER ===== */
@@ -106,55 +136,43 @@
             z-index: 1;
         }
 
-        /* ===== STATUS MESSAGES ===== */
+        /* ===== STATUS ===== */
         .status {
             text-align: center;
             padding: 60px 20px;
             display: none;
         }
-        .status.visible {
-            display: block;
-        }
+        .status.visible { display: block; }
+
         .status .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f0f0f0;
+            width: 44px;
+            height: 44px;
+            border: 4px solid #f0e6dc;
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             margin: 0 auto 16px;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .status p {
-            color: var(--text-light);
-            font-size: 15px;
-        }
-        .status .error-icon {
-            font-size: 40px;
-            display: block;
-            margin-bottom: 12px;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .status p { color: var(--text-light); font-size: 15px; }
+        .status .error-icon { font-size: 48px; display: block; margin-bottom: 12px; }
         .status .retry-btn {
             display: inline-block;
             margin-top: 16px;
-            padding: 10px 28px;
+            padding: 12px 32px;
             background: var(--primary);
             color: #fff;
             border: none;
             border-radius: 50px;
-            font-size: 14px;
+            font-size: 15px;
             font-family: inherit;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(255,107,53,0.3);
         }
-        .status .retry-btn:hover {
-            background: var(--primary-dark);
-        }
-        .status .retry-btn:active {
-            transform: scale(0.97);
-        }
+        .status .retry-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .status .retry-btn:active { transform: scale(0.97); }
 
         /* ===== GRID ===== */
         .dishes-grid {
@@ -184,10 +202,7 @@
             animation: cardIn 0.6s ease forwards;
         }
         @keyframes cardIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            to { opacity: 1; transform: translateY(0); }
         }
         .dish-card:hover {
             transform: translateY(-4px);
@@ -202,65 +217,90 @@
             position: relative;
             overflow: hidden;
         }
+        .card-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 70%);
+        }
         .card-image .emoji-bg {
             font-size: 64px;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+            transition: transform 0.3s ease;
         }
+        .dish-card:hover .emoji-bg { transform: scale(1.15) rotate(-5deg); }
+
         .card-image .rank-badge {
             position: absolute;
-            top: 16px;
-            left: 16px;
-            background: rgba(255,255,255,0.25);
+            top: 14px;
+            left: 14px;
+            background: rgba(0,0,0,0.2);
             backdrop-filter: blur(8px);
             color: #fff;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
-            padding: 4px 14px;
+            padding: 4px 12px;
             border-radius: 50px;
             letter-spacing: 1px;
         }
         .card-image .cuisine-tag {
             position: absolute;
-            top: 16px;
-            right: 16px;
+            top: 14px;
+            right: 14px;
             background: rgba(255,255,255,0.25);
             backdrop-filter: blur(8px);
             color: #fff;
             font-size: 12px;
             font-weight: 500;
-            padding: 4px 14px;
+            padding: 4px 12px;
             border-radius: 50px;
         }
 
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 12px 20px 0;
+        }
+        .card-tags .tag {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 50px;
+            background: #f5f0eb;
+            color: var(--text-light);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .card-tags .tag.hot { background: #fff0e8; color: #E74C3C; }
+        .card-tags .tag.veg { background: #e8f8e8; color: #27AE60; }
+        .card-tags .tag.mild { background: #fff8e0; color: #F39C12; }
+
         .card-body {
-            padding: 20px;
+            padding: 14px 20px 20px;
         }
         .card-body h2 {
             font-size: 22px;
             font-weight: 700;
-            margin-bottom: 4px;
             line-height: 1.3;
         }
         .card-body .dish-name-en {
             font-family: 'Playfair Display', serif;
             font-size: 13px;
             color: var(--text-light);
-            margin-bottom: 14px;
+            margin-top: 2px;
             font-style: italic;
         }
 
         .card-body .section {
             margin-top: 14px;
-        }
-        .card-body .section:first-of-type {
-            margin-top: 0;
+            padding-top: 14px;
+            border-top: 1px solid #f5f0eb;
         }
         .card-body .section-label {
             font-size: 12px;
             font-weight: 700;
             color: var(--text-light);
             letter-spacing: 2px;
-            text-transform: uppercase;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -274,38 +314,130 @@
         }
         .card-body .section-content {
             font-size: 14px;
-            line-height: 1.7;
-            color: #444;
+            line-height: 1.75;
+            color: #555;
         }
 
-        .card-body .difficulty {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        .card-meta {
+            display: flex;
+            gap: 16px;
             margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #f5f0eb;
+            flex-wrap: wrap;
+        }
+        .card-meta .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             font-size: 13px;
             color: var(--text-light);
         }
-        .card-body .difficulty .stars {
-            color: var(--primary);
-            letter-spacing: 2px;
-        }
+        .card-meta .meta-item .stars { color: var(--primary); letter-spacing: 2px; }
 
-        /* ===== CARD COLOR THEMES ===== */
+        /* Card color themes */
         .dish-card:nth-child(1) .card-image {
-            background: linear-gradient(135deg, #FF6B35, #F7A072);
+            background: linear-gradient(135deg, #FF6B35, #F7A072, #FFB088);
         }
         .dish-card:nth-child(1) .section-label .dot { background: var(--accent-1); }
 
         .dish-card:nth-child(2) .card-image {
-            background: linear-gradient(135deg, #E74C3C, #F1948A);
+            background: linear-gradient(135deg, #E74C3C, #F1948A, #F5B7B1);
         }
         .dish-card:nth-child(2) .section-label .dot { background: var(--accent-2); }
 
         .dish-card:nth-child(3) .card-image {
-            background: linear-gradient(135deg, #8E44AD, #BB8FCE);
+            background: linear-gradient(135deg, #8E44AD, #BB8FCE, #D7BDE2);
         }
         .dish-card:nth-child(3) .section-label .dot { background: var(--accent-3); }
+
+        /* ===== TOOLBAR ===== */
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .toolbar .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toolbar .btn:active { transform: scale(0.97); }
+        .toolbar .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(255,107,53,0.3);
+        }
+        .toolbar .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .toolbar .btn-primary.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        .toolbar .btn-secondary {
+            background: #fff;
+            color: var(--text);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #eee;
+        }
+        .toolbar .btn-secondary:hover {
+            background: #fafafa;
+            transform: translateY(-2px);
+        }
+        .toolbar .status-badge {
+            font-size: 12px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .toolbar .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .toolbar .status-badge .dot.online { background: #27AE60; }
+        .toolbar .status-badge .dot.offline { background: #E74C3C; }
+        .toolbar .status-badge .dot.demo { background: #F39C12; }
+
+        /* ===== DAILY TIP ===== */
+        .daily-tip {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+        .daily-tip .tip-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+        .daily-tip .tip-content { flex: 1; }
+        .daily-tip .tip-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+        .daily-tip .tip-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #555;
+        }
 
         /* ===== FOOTER ===== */
         .footer {
@@ -317,37 +449,24 @@
             border-top: 1px solid rgba(0,0,0,0.05);
             margin-top: 8px;
         }
-        .footer .brand {
-            font-weight: 500;
-            color: var(--text);
-        }
-        .footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
+        .footer .brand { font-weight: 500; color: var(--text); }
+        .footer a { color: var(--primary); text-decoration: none; }
 
         /* ===== RESPONSIVE ===== */
         @media (min-width: 640px) {
-            .dishes-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .header { padding: 56px 20px 80px; }
+            .dishes-grid { grid-template-columns: repeat(2, 1fr); }
+            .header { padding: 52px 20px 80px; }
             .header h1 { font-size: 34px; }
             .header-icon { font-size: 56px; }
         }
 
         @media (min-width: 900px) {
-            .dishes-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .container {
-                padding: 0 24px;
-            }
+            .dishes-grid { grid-template-columns: repeat(3, 1fr); }
+            .container { padding: 0 24px; }
             .card-image { height: 180px; }
             .card-image .emoji-bg { font-size: 72px; }
         }
 
-        /* ===== SMOOTH SCROLL ===== */
         html { scroll-behavior: smooth; }
     </style>
 </head>
@@ -355,6 +474,12 @@
 
     <!-- HEADER -->
     <header class="header">
+        <span class="floating-food">🍜</span>
+        <span class="floating-food">🍣</span>
+        <span class="floating-food">🥘</span>
+        <span class="floating-food">🍰</span>
+        <span class="floating-food">🥗</span>
+        <span class="floating-food">🍝</span>
         <span class="header-icon">🍽️</span>
         <h1>今日美食推薦</h1>
         <p class="subtitle">AI 為您精心挑選 · 每日更新</p>
@@ -363,6 +488,25 @@
 
     <!-- CONTENT -->
     <div class="container">
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="btn btn-primary" id="refreshBtn" onclick="refreshDishes()">🔄 換一批推薦</button>
+            <button class="btn btn-secondary" onclick="toggleDemo()">📦 使用範例資料</button>
+            <span class="status-badge" id="apiStatus">
+                <span class="dot offline" id="statusDot"></span>
+                <span id="statusText">API 未連接</span>
+            </span>
+        </div>
+
+        <!-- Daily Tip -->
+        <div class="daily-tip" id="dailyTip">
+            <span class="tip-icon">💡</span>
+            <div class="tip-content">
+                <div class="tip-label">每日飲食小知識</div>
+                <div class="tip-text" id="tipText">五月天氣漸熱，建議多選用當季食材，如蘆筍、櫻桃、豌豆等，清爽開胃又養生。</div>
+            </div>
+        </div>
 
         <!-- Loading -->
         <div class="status visible" id="loadingStatus">
@@ -373,7 +517,7 @@
         <!-- Error -->
         <div class="status" id="errorStatus">
             <span class="error-icon">😅</span>
-            <p id="errorMessage">暫時無法取得推薦，請稍後再試</p>
+            <p id="errorMessage">無法連線至伺服器</p>
             <button class="retry-btn" onclick="loadDishes()">重新整理</button>
         </div>
 
@@ -398,51 +542,185 @@
         document.getElementById('dateDisplay').textContent =
             `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日 ${days[today.getDay()]}`;
 
+        // ===== DAILY TIPS =====
+        const dailyTips = [
+            '五月天氣漸熱，建議多選用當季食材，如蘆筍、櫻桃、豌豆等，清爽開胃又養生。',
+            '烹調時適量使用檸檬汁或醋，不僅增添風味，還能幫助減少用鹽量，吃得更健康。',
+            '選擇當季食材不僅價格實惠，營養價值也更高——春天的菠菜、夏天的瓜果都是好選擇。',
+            '煮義大利麵時，水裡加適量鹽，麵條會更有彈性口感，也更能吸附醬汁。',
+            '煎魚前先用廚房紙巾擦乾水分，魚皮才不會破，煎出來金黃酥脆。',
+            '炒青菜時大火快炒最能保留營養與色澤，不要蓋鍋蓋太久，否則會變黃。',
+            '隔夜飯拿來做炒飯最理想，米粒水分少、容易炒散，口感粒粒分明。',
+            '煮湯時若太油，放幾塊冰塊能快速凝固油脂，用湯匙撈起即可輕鬆去油。',
+            '烤箱使用前預熱至少10分鐘，食物受熱更均勻，表面也更容易上色。',
+            '切洋蔥時將刀沾點水，可以減少硫化物揮發，就不會流淚了。',
+            '肉類料理前先室溫回溫15分鐘，煎煮時更容易掌控熟度，肉汁也更豐富。',
+            '煮飯時加幾滴油和一小撮鹽，煮出來的飯粒粒晶瑩、口感更Q彈。'
+        ];
+        document.getElementById('tipText').textContent = dailyTips[today.getDate() % dailyTips.length];
+
         // ===== API CONFIG =====
         const API_URL = '/api/dish';
+
+        // ===== DEMO DATA =====
+        const DEMO_DISHES = [
+            {
+                name: '普羅旺斯燉菜',
+                name_en: 'Ratatouille',
+                emoji: '🥘',
+                cuisine: '法式',
+                description: '源自法國南部的經典鄉村料理，將新鮮的茄子、櫛瓜、甜椒、番茄等夏季蔬菜層層疊放，以橄欖油和普羅旺斯香草慢火燉煮。每一口都充滿陽光的味道，色澤繽紛如畫。',
+                reason: '五月初夏正是櫛瓜和甜椒盛產的季節，這道菜完美展現當季蔬菜的鮮甜，清爽無負擔。',
+                tasting_notes: '搭配硬皮歐包蘸食醬汁，或佐一杯輕盈的普羅旺斯玫瑰酒，風味更上一層樓。',
+                difficulty: '中等',
+                cooking_time: '45 分鐘',
+                tags: ['素食可', '地中海', '低卡']
+            },
+            {
+                name: '日式親子丼',
+                name_en: 'Oyakodon',
+                emoji: '🍚',
+                cuisine: '日式',
+                description: '經典日式家常料理，以嫩滑的雞腿肉和半熟蛋液鋪在熱騰騰的米飯上，淋上醬油、味醂和柴魚高湯調製的甘甜醬汁。名稱「親子」取自雞肉（親）與雞蛋（子）的關係。',
+                reason: '天熱沒胃口時，一碗滑嫩多汁的親子丼最能開胃，從準備到上桌只要15分鐘。',
+                tasting_notes: '淋上一點七味粉增添微辣層次，配上一碗味噌湯和醃漬小菜就是完美一餐。',
+                difficulty: '簡單',
+                cooking_time: '15 分鐘',
+                tags: ['快速', '入門', '一人食']
+            },
+            {
+                name: '芒果椰奶糯米飯',
+                name_en: 'Mango Sticky Rice',
+                emoji: '🥭',
+                cuisine: '泰式',
+                description: '泰國最具代表性的經典甜點，運用新鮮成熟的芒果搭配椰奶浸泡的糯米飯，淋上濃郁椰奶醬汁，撒上芝麻或綠豆仁增添口感。甜中帶鹹、酸中帶香，層次豐富。',
+                reason: '五月正是芒果盛產季節，香甜多汁的芒果搭配椰奶糯米，是迎接夏天的最佳儀式感甜點。',
+                tasting_notes: '選用愛文芒果或金煌芒果，甜度高、果肉細嫩；糯米飯微溫時享用口感最佳，可搭配熱茶平衡甜度。',
+                difficulty: '中等',
+                cooking_time: '40 分鐘',
+                tags: ['甜點', '夏日限定', '泰式']
+            }
+        ];
+
+        let isDemoMode = false;
+
+        // ===== API HEALTH =====
+        async function checkApiHealth() {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            try {
+                const res = await fetch(API_URL, { method: 'HEAD', signal: AbortSignal.timeout(3000) });
+                dot.className = 'dot demo';
+                text.textContent = '顯示範例資料';
+                return false;
+            } catch {
+                dot.className = 'dot offline';
+                text.textContent = 'API 未連接（使用範例）';
+                return false;
+            }
+        }
 
         // ===== LOAD DISHES =====
         async function loadDishes() {
             const grid = document.getElementById('dishesGrid');
             const loading = document.getElementById('loadingStatus');
             const error = document.getElementById('errorStatus');
+            const btn = document.getElementById('refreshBtn');
 
-            // Reset UI
             grid.classList.remove('visible');
             grid.innerHTML = '';
             loading.classList.add('visible');
             error.classList.remove('visible');
+            btn.classList.add('loading');
+            btn.textContent = '⏳ 生成中...';
 
             try {
-                const res = await fetch(API_URL);
+                const res = await fetch(API_URL, { signal: AbortSignal.timeout(10000) });
                 if (!res.ok) throw new Error(`伺服器回應異常 (${res.status})`);
-
                 const data = await res.json();
-
-                if (!data.dishes || data.dishes.length === 0) {
-                    throw new Error('暫時沒有推薦料理，請稍後再試');
-                }
+                if (!data.dishes || data.dishes.length === 0) throw new Error('暫無推薦料理');
 
                 loading.classList.remove('visible');
                 renderDishes(data.dishes, grid);
-
+                updateApiStatus(true);
+                isDemoMode = false;
+                document.querySelector('[onclick="toggleDemo()"]').textContent = '📦 使用範例資料';
             } catch (err) {
+                // Fallback to demo data
                 loading.classList.remove('visible');
-                document.getElementById('errorMessage').textContent = err.message || '無法連線至伺服器';
-                error.classList.add('visible');
+                renderDishes(DEMO_DISHES, grid);
+                updateApiStatus(false);
+                isDemoMode = true;
+                document.querySelector('[onclick="toggleDemo()"]').textContent = '🔄 回到 API 模式';
+                document.getElementById('statusText').textContent = '使用範例資料（API 無法連接）';
+            } finally {
+                btn.classList.remove('loading');
+                btn.textContent = '🔄 換一批推薦';
             }
         }
 
-        // ===== RENDER DISHES =====
+        function updateApiStatus(online) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            if (online) {
+                dot.className = 'dot online';
+                text.textContent = 'API 已連接';
+            } else {
+                dot.className = 'dot demo';
+                text.textContent = '顯示範例資料';
+            }
+        }
+
+        // ===== TOGGLE DEMO =====
+        function toggleDemo() {
+            const grid = document.getElementById('dishesGrid');
+            const btn = document.querySelector('[onclick="toggleDemo()"]');
+            if (isDemoMode) {
+                loadDishes();
+            } else {
+                grid.classList.remove('visible');
+                grid.innerHTML = '';
+                renderDishes(DEMO_DISHES, grid);
+                isDemoMode = true;
+                btn.textContent = '🔄 回到 API 模式';
+                document.getElementById('statusText').textContent = '顯示範例資料';
+                document.getElementById('statusDot').className = 'dot demo';
+            }
+        }
+
+        // ===== REFRESH =====
+        async function refreshDishes() {
+            if (isDemoMode) {
+                // Shuffle demo data for variety
+                const shuffled = [...DEMO_DISHES].sort(() => Math.random() - 0.5);
+                const grid = document.getElementById('dishesGrid');
+                grid.classList.remove('visible');
+                grid.innerHTML = '';
+                renderDishes(shuffled, grid);
+            } else {
+                await loadDishes();
+            }
+        }
+
+        // ===== RENDER =====
         function renderDishes(dishes, grid) {
             const rankLabels = ['首選推薦', '精選推薦', '不容錯過'];
 
             dishes.forEach((dish, i) => {
                 const card = document.createElement('div');
                 card.className = 'dish-card';
-
                 const rank = i < rankLabels.length ? rankLabels[i] : `推薦 #${i + 1}`;
-                const difficultyStars = getDifficultyStars(dish.difficulty || '中等');
+                const difficultyStars = { '簡單': '★', '简易': '★', '中等': '★★', '困難': '★★★', '困难': '★★★' }[dish.difficulty] || '★★';
+
+                const tagsHtml = dish.tags && dish.tags.length
+                    ? `<div class="card-tags">${dish.tags.map(t => {
+                        const cls = ['素食', '素', '蔬'].some(k => t.includes(k)) ? 'veg' : t.includes('辣') ? 'hot' : '';
+                        return `<span class="tag ${cls}">${t}</span>`;
+                    }).join('')}</div>`
+                    : '';
+
+                const cookingTime = dish.cooking_time ? `
+                    <span class="meta-item">⏱️ ${dish.cooking_time}</span>` : '';
 
                 card.innerHTML = `
                     <div class="card-image">
@@ -450,56 +728,39 @@
                         <span class="cuisine-tag">${dish.cuisine || '綜合'}</span>
                         <span class="emoji-bg">${dish.emoji || '🍽️'}</span>
                     </div>
+                    ${tagsHtml}
                     <div class="card-body">
                         <h2>${dish.name}</h2>
                         ${dish.name_en ? `<p class="dish-name-en">${dish.name_en}</p>` : ''}
 
                         <div class="section">
-                            <div class="section-label">
-                                <span class="dot"></span> 料理介紹
-                            </div>
+                            <div class="section-label"><span class="dot"></span> 料理介紹</div>
                             <p class="section-content">${dish.description || ''}</p>
                         </div>
 
                         <div class="section">
-                            <div class="section-label">
-                                <span class="dot"></span> 推薦原因
-                            </div>
+                            <div class="section-label"><span class="dot"></span> 推薦原因</div>
                             <p class="section-content">${dish.reason || ''}</p>
                         </div>
 
                         ${dish.tasting_notes ? `
                         <div class="section">
-                            <div class="section-label">
-                                <span class="dot"></span> 品味重點
-                            </div>
+                            <div class="section-label"><span class="dot"></span> 品味重點</div>
                             <p class="section-content">${dish.tasting_notes}</p>
                         </div>` : ''}
 
-                        <div class="difficulty">
-                            <span>👨‍🍳 難易度</span>
-                            <span class="stars">${difficultyStars}</span>
-                            <span>${dish.difficulty || '中等'}</span>
+                        <div class="card-meta">
+                            <span class="meta-item">👨‍🍳 難易度 <span class="stars">${difficultyStars}</span> ${dish.difficulty || '中等'}</span>
+                            ${cookingTime}
                         </div>
                     </div>
                 `;
 
                 grid.appendChild(card);
-
-                // Staggered animation
-                const delay = 150 + i * 200;
-                setTimeout(() => {
-                    card.classList.add('animate-in');
-                }, delay);
+                setTimeout(() => card.classList.add('animate-in'), 150 + i * 200);
             });
 
-            // Show grid
             grid.classList.add('visible');
-        }
-
-        function getDifficultyStars(difficulty) {
-            const map = { '簡單': '★', '简易': '★', '中等': '★★', '困難': '★★★', '困难': '★★★' };
-            return map[difficulty] || '★★';
         }
 
         // ===== INIT =====
