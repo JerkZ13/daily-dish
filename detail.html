@@ -646,11 +646,13 @@
             const logoLetter = article.source.charAt(0);
             const bodyHtml = article.content.map(p => `<p>${p}</p>`).join('');
             const tagsHtml = article.tags.map(t => `<span class="tag">${t}</span>`).join('');
+            const imgUrl = article.imageUrl || `https://picsum.photos/seed/${article.title.replace(/[^\w一-鿿]/g,'').slice(0,30)}/800/350`;
 
             container.innerHTML = `
                 <article class="article">
-                    <div class="article-image" style="background:${article.imageColor}">
-                        <span class="image-icon">${article.imageIcon}</span>
+                    <div class="article-image" style="background:${article.imageColor};position:relative;overflow:hidden">
+                        <img src="${imgUrl}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+                        <span class="image-icon" style="position:relative;z-index:1">${article.imageIcon}</span>
                     </div>
                     <div class="article-body">
                         <span class="article-category">${article.category}</span>
